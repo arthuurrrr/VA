@@ -1,0 +1,88 @@
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Load d3-cloud -->
+<script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+
+<script>
+
+// List of words
+var myWords = [
+  { word: 'Business', size: '98', color: '#FFC312' },
+  { word: 'computer science', size: '14', color: '#C4E538' },
+  { word: 'Engineering', size: '77', color: '#12CBC4' },
+  { word: 'Law', size: '77', color: '#FDA7DF' },
+  { word: 'Medicine', size: '42', color: '#B0C4DE' },
+  { word: 'Nursing', size: '70', color: '#0652DD' },
+  { word: 'Architecture', size: '42', color: '#9980FA' },
+  { word: 'information systems', size: '7', color: '#006266' },
+  { word: 'Accountancy', size: '14', color: '#F0E68C' },
+  { word: 'Economics', size: '56', color: '#DA70D6' },
+  { word: 'Finance', size: '91', color: '#8E44AD' },
+  { word: 'Marketing', size: '63', color: '#C0392B' },
+  { word: 'hr', size: '42', color: '#E74C3C' },
+  { word: 'Philosophy', size: '7', color: '#AF7AC5' },
+  { word: 'Psychology', size: '35', color: '#2ECC71' },
+  { word: 'Sociology', size: '7', color: '#F5B041' }
+]
+;
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 10, bottom: 10, left: 10},
+    width = 800 - margin.left - margin.right,
+    height = 800 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz").append("svg")
+    .attr("width", (width + margin.left + margin.right) * 2)
+    .attr("height", (height + margin.top + margin.bottom) * 2)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+// Wordcloud features that are different from one word to the other must be here
+var layout = d3.layout.cloud()
+  .size([width, height])
+  .words(myWords.map(function(d) { return {text: d.word, size:d.size}; }))
+  .padding(15)        //space between words
+  .rotate(function() { return ~~(Math.random() * 2) * 90; })
+  .fontSize(function(d) { return d.size; })      // font size of words
+  .on("end", draw);
+layout.start();
+
+// This function takes the output of 'layout' above and draw the words
+// Wordcloud features that are THE SAME from one word to the other can be here
+function draw(words) {
+  svg
+    .append("g")
+      .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size; })
+        .style("fill", function(d) { return getColor(d); })  // Set color based on word
+        .attr("text-anchor", "middle")
+        .style("font-family", "Impact")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+}
+function getColor(d) {
+  var color = "#69b3a2";  // default color
+  myWords.forEach(function(word) {
+    if (word.word === d.text) {
+      color = word.color;
+    }
+  });
+  return color;
+}
+</script>
